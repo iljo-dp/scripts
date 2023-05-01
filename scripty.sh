@@ -1,48 +1,21 @@
 #!/bin/bash
 
-# Set the LAN-segment network address based on the project group
-# Replace the "172.18.0.0/16" with the appropriate network address for your group
-case "$1" in
-    1)
-        LAN_SEGMENT="172.16.0.0/16"
-        ;;
-    2)
-        LAN_SEGMENT="172.18.0.0/16"
-        ;;
-    3)
-        LAN_SEGMENT="172.19.0.0/16"
-        ;;
-    4)
-        LAN_SEGMENT="172.20.0.0/16"
-        ;;
-    5)
-        LAN_SEGMENT="172.21.0.0/16"
-        ;;
-    6)
-        LAN_SEGMENT="172.22.0.0/16"
-        ;;
-    7)
-        LAN_SEGMENT="172.23.0.0/16"
-        ;;
-    8)
-        LAN_SEGMENT="172.24.0.0/16"
-        ;;
-    *)
-        echo "Usage: $0 [1-8]" >&2
-        exit 1
-        ;;
-esac
+# Create groups
+sudo groupadd zaakvoerder
+sudo groupadd klantenrelaties
+sudo groupadd administratie
+sudo groupadd IT_medewerker
 
-# Get the current IP address and netmask for the LAN-segment interface
-CURRENT_IP=$(ip -o -4 addr show dev eth1 | awk '{print $4}' | cut -d/ -f1)
-CURRENT_NETMASK=$(ip -o -4 addr show dev eth1 | awk '{print $4}' | cut -d/ -f2)
+# Add users
+sudo useradd -m -c "Iljo De Poorter" -s /bin/bash -g zaakvoerder -p $(openssl passwd -1 iljo123) iljodp
+sudo useradd -m -c "David Beerens" -s /bin/bash -g zaakvoerder -p $(openssl passwd -1 david123) davidB
+sudo useradd -m -c "Tine Van de Velde" -s /bin/bash -g klantenrelaties -p $(openssl passwd -1 tine123) tinevdv
+sudo useradd -m -c "Joris Quataert" -s /bin/bash -g administratie -p $(openssl passwd -1 joris123) jorisq
+sudo useradd -m -c "Kim De Waele" -s /bin/bash -g IT_medewerker -p $(openssl passwd -1 kim123) kimdw
 
-# Update the network interface configuration file with the new IP address and netmask
-sudo sed -i "s/address $CURRENT_IP/address $LAN_SEGMENT/g" /etc/network/interfaces
-sudo sed -i "s/netmask $CURRENT_NETMASK/netmask 255.255.0.0/g" /etc/network/interfaces
-
-# Restart the networking service to apply the changes
-sudo systemctl restart networking
-
-# Display the new IP address and netmask for the LAN-segment interface
-echo "New IP address for eth1: $(ip -o -4 addr show dev eth1 | awk '{print $4}')"
+# Change ownership of the home directories to the users
+sudo chown -R iljodp:zaakvoerder /home/iljodp
+sudo chown -R davidB:zaakvoerder /home/davidB
+sudo chown -R tinevdv:klantenrelaties /home/tinevdv
+sudo chown -R jorisq:administratie /home/jorisq
+sudo chown -R kimdw:IT_medewerker /home/kimdw
