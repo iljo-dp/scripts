@@ -101,3 +101,4 @@ alias tofish="chsh $USER -s /bin/fish && echo 'Now log out.'"
 # the terminal rickroll
 alias rr='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh | bash'
 
+starship init fish | source
