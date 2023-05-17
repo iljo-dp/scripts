@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Copyright (C) 2023 Iljo De Poorter
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -11,19 +10,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # You can contact me at my electronic mail at Iljodp@gmail.com
-
 # Install required packages
-apt-get install -y fish exa curl isc-dhcp-server bind9 bind9-doc dnsutils
+apt-get update
+apt-get install -y fish exa curl isc-dhcp-server bind9 bind9-doc
 
 # Copy Fish shell configuration
-cp config.fish /root/.config/fish
-source /root/.config/fish/config.fish
+mkdir -p /root/.config/fish
+cp config.fish /root/.config/fish/config.fish
 
 # Change the default shell for root user to Fish
-chsh root -s /usr/bin/fish
+chsh -s /usr/bin/fish root
 
 # Install Starship prompt
-curl -Ss https://starship.rs/install.sh | sh
+curl -fsSL https://starship.rs/install.sh | bash
 
 # Create groups
 for group in zaakvoerder klantenrelaties administratie IT_medewerker; do
@@ -46,7 +45,7 @@ create_user() {
         password="${password}${last_name_initial}"
     fi
 
-    useradd -m -c "$full_name" -s /bin/bash -g "$group" -p $(openssl passwd -1 "$password") "${username,,}${last_name_initial,,}"
+    useradd -m -c "$full_name" -s /bin/bash -g "$group" -p "$(openssl passwd -1 "$password")" "${username,,}${last_name_initial,,}"
     chown -R "${username,,}${last_name_initial,,}":"$group" "/home/${username,,}${last_name_initial,,}"
 }
 
