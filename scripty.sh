@@ -98,3 +98,33 @@ cp "$dhcp_server_file" "$dhcp_server_file.bak"
 
 # Write the new content to the file
 echo "$dhcp_server_content" > "$dhcp_server_file"
+
+
+# Configure DHCPD Server
+dhcpd_server_file="/etc/dhcp/dhcpd.conf"
+dhcpd_server_content=$(cat <<EOF
+
+option domain-name "tisib.local";
+option-domain-name-server 172.19.0.1;
+
+default-lease-time 600;
+ddns-update-style none;
+
+authoritative;
+
+subnet 172.19.0.0 netmask 255.255.0.0 {
+     range 172.19.0.0 172.19.0.50;
+     option routers 172.18.0.1;
+     option subnet-mask 255.255.0.0;
+     default-lease-time 720;
+}
+EOF
+)
+
+# Backup the original file (optional but recommended)
+cp "$dhcpd_server_file" "$dhcpd_server_file.bak"
+
+# Write the new content to the file
+echo "$dhcpd_server_content" > "$dhcpd_server_file"
+
+
