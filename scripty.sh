@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Copyright (C) 2023 Iljo De Poorter
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -10,16 +11,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # You can contact me at my electronic mail at Iljodp@gmail.com
+
 # Install required packages
-apt-get update
+apt-get update -y && apt upgrade -y
 apt-get install -y fish exa curl isc-dhcp-server bind9 bind9-doc
+
 # Copy Fish shell configuration
-#mkdir -p /root/.config/fish
-#cp config.fish /root/.config/fish/config.fish
+# mkdir -p /root/.config/fish
+# cp config.fish /root/.config/fish/config.fish
+
 # Change the default shell for root user to Fish
-#chsh -s /usr/bin/fish root
+# chsh -s /usr/bin/fish root
+
 # Install Starship prompt
-#curl -fsSL https://starship.rs/install.sh | bash
+# curl -fsSL https://starship.rs/install.sh | bash
+
 # Create groups
 groupadd zaakvoerder
 groupadd klantenrelaties
@@ -31,19 +37,14 @@ create_user() {
     local username=$1
     local full_name=$2
     local group=$3
-    local password="${username}123"
-    local last_name_initial
+    local password="iljo123"
+    local login_name
 
     IFS=' ' read -ra name_parts <<< "$full_name"
-    # Removed unused variable first_name
+    login_name="${name_parts[0],,}"
 
-    if [[ ${#name_parts[@]} -gt 1 ]]; then
-        last_name_initial=$(echo "${name_parts[@]:1}" | awk -F' ' '{for (i=1;i<=NF;i++) print substr($i,1,1)}' | tr -d '\n' | tr '[:upper:]' '[:lower:]')
-        password="${password}${last_name_initial}"
-    fi
-
-    useradd -m -c "$full_name" -s /bin/bash -g "$group" -p "$(openssl passwd -1 "$password")" "${username,,}${last_name_initial,,}"
-    chown -R "${username,,}${last_name_initial,,}":"$group" "/home/${username,,}${last_name_initial,,}"
+    useradd -m -c "$full_name" -s /bin/bash -g "$group" -p "$(openssl passwd -1 "$password")" "$login_name"
+    chown -R "$login_name":"$group" "/home/$login_name"
 }
 
 # Prompt for user creation
@@ -53,9 +54,9 @@ for i in 1 2; do
 done
 
 # Create additional users
-create_user "tinevdv" "Tine Van de Velde" "klantenrelaties"
-create_user "jorisq" "Joris Quataert" "administratie"
-create_user "kimdw" "Kim De Waele" "IT_medewerker"
+useradd -m -c "Tine Van de Velde" -s /bin/bash -g klantenrelaties -p $(openssl passwd -1 tine123) tinevdv
+useradd -m -c "Joris Quataert" -s /bin/bash -g administratie -p $(openssl passwd -1 joris123) jorisq
+useradd -m -c "Kim De Waele" -s /bin/bash -g IT_medewerker -p $(openssl passwd -1 kim123) kimdw
 
 # Configure network interfaces
 interfaces_file="/etc/network/interfaces"
