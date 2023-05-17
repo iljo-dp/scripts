@@ -1,6 +1,10 @@
 #!/bin/bash
 
 apt-get install fish exa curl isc-dhcp-server bind9 bind9-doc dnsutils
+cp config.fish /root/.config/fish
+source /root/.config/fish/config.fish
+
+chsh root -s /usr/bin/fish
 
 curl -Ss https://starship.rs/install.sh | sh
 
