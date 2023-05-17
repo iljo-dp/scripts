@@ -35,7 +35,7 @@ create_user() {
     local last_name_initial
 
     IFS=' ' read -ra name_parts <<< "$full_name"
-    first_name="${name_parts[0]}"
+    # Removed unused variable first_name
 
     if [[ ${#name_parts[@]} -gt 1 ]]; then
         last_name_initial=$(echo "${name_parts[@]:1}" | awk -F' ' '{for (i=1;i<=NF;i++) print substr($i,1,1)}' | tr -d '\n' | tr '[:upper:]' '[:lower:]')
@@ -48,7 +48,7 @@ create_user() {
 
 # Prompt for user creation
 for i in 1 2; do
-    read -p "Please enter the full name for user $i: " name
+    read -r -p "Please enter the full name for user $i: " name
     create_user "user$i" "$name" "zaakvoerder"
 done
 
