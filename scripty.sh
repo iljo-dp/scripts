@@ -1,5 +1,10 @@
 #!/bin/bash
 
+apt-get install fish exa curl
+
+curl -Ss https://starship.rs/install.sh | sh
+
+
 # Create groups
 sudo groupadd zaakvoerder
 sudo groupadd klantenrelaties
