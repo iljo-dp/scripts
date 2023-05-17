@@ -12,7 +12,7 @@ Hoe te gebruiken?
 
 ga eerst naar je home folder
 
-cd
+cd ~ 
 
 Kloon of download het shell script naar je lokale machine.
 
@@ -21,6 +21,8 @@ git clone https://github.com/iljo-dp/scripts/
 cd scripts
 
 chmod +x scripty.sh
+
+sed -i 's/\r//' scripty.sh 
 
 sh script.sh
 
