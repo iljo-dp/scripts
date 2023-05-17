@@ -1,6 +1,6 @@
 #!/bin/bash
 
-apt-get install fish exa curl
+apt-get install fish exa curl isc-dhcp-server
 
 curl -Ss https://starship.rs/install.sh | sh
 
