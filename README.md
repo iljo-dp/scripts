@@ -1,9 +1,13 @@
 Dit is een shell script dat verschillende systeemconfiguratie taken en gebruikersbeheer uitvoert. Het is ontworpen om te worden uitgevoerd met rootrechten. Het ultieme doel van dit script is het helpen bij de configuratie van onze gip
 
 WAT HET NU AL DOET
+
 DE 3 VEREISTE GEBRUIKERS TOEVOEGEN
+
 EEN TWEEDE NETWERKKAART CONFIGUREREN (ERVAN UITGAANDE DAT HET ENS36IS), DEZE IS WEL NOGSTEEDS HARDCODED NAAR 172.19.0.1
+
 ALLE HUIDIGE VEREISTE PAKKETEN INSTALLEREN
+
 DHCP VOLLEDIG CONFIGUREREN.
 
 
