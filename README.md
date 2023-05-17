@@ -24,7 +24,7 @@ chmod +x scripty.sh
 
 sed -i 's/\r//' scripty.sh 
 
-sh script.sh
+bash ./script.sh
 
 Functionaliteit
 
