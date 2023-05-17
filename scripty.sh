@@ -13,21 +13,18 @@
 # Install required packages
 apt-get update
 apt-get install -y fish exa curl isc-dhcp-server bind9 bind9-doc
-
 # Copy Fish shell configuration
-mkdir -p /root/.config/fish
-cp config.fish /root/.config/fish/config.fish
-
+#mkdir -p /root/.config/fish
+#cp config.fish /root/.config/fish/config.fish
 # Change the default shell for root user to Fish
-chsh -s /usr/bin/fish root
-
+#chsh -s /usr/bin/fish root
 # Install Starship prompt
-curl -fsSL https://starship.rs/install.sh | bash
-
+#curl -fsSL https://starship.rs/install.sh | bash
 # Create groups
-for group in zaakvoerder klantenrelaties administratie IT_medewerker; do
-    groupadd "$group"
-done
+groupadd zaakvoerder
+groupadd klantenrelaties
+groupadd administratie
+groupadd IT_medewerker
 
 # Function to create user
 create_user() {
