@@ -4,7 +4,7 @@ WAT HET NU AL DOET
 
 DE 3 VEREISTE GEBRUIKERS TOEVOEGEN
 
-EEN TWEEDE NETWERKKAART CONFIGUREREN (ERVAN UITGAANDE DAT HET ENS36IS), DEZE IS WEL NOGSTEEDS HARDCODED NAAR 172.19.0.1
+EEN TWEEDE NETWERKKAART CONFIGUREREN (ERVAN UITGAANDE DAT HET ENS36 IS), DEZE IS WEL NOGSTEEDS HARDCODED NAAR 172.19.0.1
 
 ALLE HUIDIGE VEREISTE PAKKETEN INSTALLEREN
 
@@ -44,11 +44,17 @@ Het script voert de volgende taken uit:
 
     Installeert de volgende softwarepakketten: fish, exa, curl, isc-dhcp-server, bind9, bind9-doc en dnsutils.
     Installeert de Starship-prompt.
+    De standaart shell verzetten naar fish
     Maakt groepen aan: zaakvoerder, klantenrelaties, administratie en IT_medewerker.
     Voegt gebruikers toe aan de aangemaakte groepen en genereert wachtwoorden op basis van de ingevoerde namen.
     Wijzigt eigenaarschap van de home directories van de gebruikers.
     Vervangt de inhoud van het bestand /etc/network/interfaces door specifieke configuratiegegevens.
     Om zo een tweede netwerk kaart(lan seggment) te voorzien van een ipadress,
+    Configuratie van de dhcp server
+    Zorgen voor netwerk beveiliging en een antivirus
+    het zorgen voor netwerk mootor tools (bmon)
+    Het installeren en configureren van webmin
+    
 
 Let op: Zorg ervoor dat je een back-up hebt van belangrijke bestanden voordat je het script uitvoert. Het script kan bestanden wijzigen en zelfs vervangen.
 
@@ -60,6 +66,4 @@ Opmerkingen
 
 Bijdragen
 
-Je kunt bijdragen aan dit script leveren door verbeteringen voor te stellen of eventuele problemen te melden via de GitHub-pagina van dit project.
-
-IK ZAL NIET REAGEREN OP DISCORD BERICHTEN OF MAILS, VOOR VRAGEN EN BIJDRAGEN AAN DE SCRIPT BEN JE VERPLICHT DE GITHUB PLATFORM TE GEBRUIKEN.
+Je kunt bijdragen aan dit script leveren door verbeteringen voor te stellen of eventuele problemen te melden via de GitHub-pagina van dit project, of me te contacteren via mail/discord.
