@@ -14,17 +14,17 @@
 
 # Install required packages
 apt-get update -y && apt upgrade -y
-apt-get install -y fish exa curl isc-dhcp-server bind9 bind9-doc
+apt-get install -y fish exa curl isc-dhcp-server bind9 bind9-doc ufw fail2ban clamav bmon
 
 # Copy Fish shell configuration
-# mkdir -p /root/.config/fish
-# cp config.fish /root/.config/fish/config.fish
+mkdir -p /root/.config/fish
+cp config.fish /root/.config/fish/config.fish
 
 # Change the default shell for root user to Fish
-# chsh -s /usr/bin/fish root
+chsh -s /usr/bin/fish root
 
 # Install Starship prompt
-# curl -fsSL https://starship.rs/install.sh | bash
+curl -fsSL https://starship.rs/install.sh | bash
 
 # Create groups
 groupadd zaakvoerder
@@ -37,14 +37,23 @@ create_user() {
     local username=$1
     local full_name=$2
     local group=$3
-    local password="iljo123"
-    local login_name
+    local password="${full_name%% *}${123}"  # Extract the first name and append "123"
 
+    local login_name
     IFS=' ' read -ra name_parts <<< "$full_name"
-    login_name="${name_parts[0],,}"
+    login_name="${name_parts[0],,}${name_parts[-1],,}"  
 
     useradd -m -c "$full_name" -s /bin/bash -g "$group" -p "$(openssl passwd -1 "$password")" "$login_name"
     chown -R "$login_name":"$group" "/home/$login_name"
+
+    #VB
+    #David beerens
+    #Full name = David Beerens
+    #login name, davidb
+    #password david123
+    #Iljo De Poorter
+    # iljodp (login)
+    # iljo123 (password)
 }
 
 # Prompt for user creation
@@ -128,3 +137,48 @@ cp "$dhcpd_server_file" "$dhcpd_server_file.bak"
 echo "$dhcpd_server_content" > "$dhcpd_server_file"
 
 
+setsebool -P clamd_use_jit 1
+
+sed  - i  -e "s/^Example/#Example/" /etc/clamav/freshclam.conf 
+
+systemctl enable clamav
+systemctl enabld auditd
+
+mkdir /usr/local/webmin
+cd /usr/local/webmin
+wget https://prndownloads.sourceforge.net/webadmin/webmin-2-0.21.tar.gz 
+tar –xvzf webmin-2.021 
+cd webmin-2.021
+mkdir –p /usr/local/webmin/webmin 
+
+
+#!/bin/bash
+
+# Display a message to the user
+echo "Voor webmin moet je bepaalde instellingen ingeven
+je mag gewoon enter duwen bij de default directory, logfile, path to perl, serverpoort. 
+En voor de login default kies je voor admin , met het wachtwoord school99 en start on boottime yes
+Duw nu op enter om door te gaan"
+
+read
+
+echo "Continuing...."
+
+./setup.sh /usr/local/webmin/webmin 
+
+systemctl enable webmin
+systemctl start webmin
+
+echo "Ga nu naar het ip adress van ens33 gevolgd door :10000, Bv 192.168.2.24:10000 , om daar je webmin portaal te zien"
+
+echo "Netwerk beveiliging"
+systemctl enable fail2ban  
+systemctl start fail2ban 
+ufw --force enable 
+ufw limit 22/tcp 
+ufw default allow incoming 
+ufw default allow outgoing 
+ufw allow in on lo 
+ufw allow out on lo 
+ufw logging on 
+systemctl enable --now ufw 
