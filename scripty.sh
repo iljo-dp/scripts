@@ -1,19 +1,8 @@
 #!/bin/bash
 
-# Copyright (C) 2023 Iljo De Poorter
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
-# You can contact me at my electronic mail at Iljodp@gmail.com
-
 # Install required packages
-apt-get update -y && apt upgrade -y
+apt-get update
+apt-get upgrade -y
 apt-get install -y fish exa curl isc-dhcp-server bind9 bind9-doc ufw fail2ban clamav bmon
 
 # Copy Fish shell configuration
@@ -37,23 +26,14 @@ create_user() {
     local username=$1
     local full_name=$2
     local group=$3
-    local password="${full_name%% *}${123}"  # Extract the first name and append "123"
 
-    local login_name
-    IFS=' ' read -ra name_parts <<< "$full_name"
-    login_name="${name_parts[0],,}${name_parts[-1],,}"  
+    # Generate login name and password
+    local login_name="${full_name%% *}"
+    local password="${login_name,,}123"
 
-    useradd -m -c "$full_name" -s /bin/bash -g "$group" -p "$(openssl passwd -1 "$password")" "$login_name"
+    # Create user and set password
+    useradd -m -c "$full_name" -s /bin/bash -g "$group" -p "$(mkpasswd -m sha-512 "$password")" "$login_name"
     chown -R "$login_name":"$group" "/home/$login_name"
-
-    #VB
-    #David beerens
-    #Full name = David Beerens
-    #login name, davidb
-    #password david123
-    #Iljo De Poorter
-    # iljodp (login)
-    # iljo123 (password)
 }
 
 # Prompt for user creation
@@ -63,9 +43,9 @@ for i in 1 2; do
 done
 
 # Create additional users
-useradd -m -c "Tine Van de Velde" -s /bin/bash -g klantenrelaties -p $(openssl passwd -1 tine123) tinevdv
-useradd -m -c "Joris Quataert" -s /bin/bash -g administratie -p $(openssl passwd -1 joris123) jorisq
-useradd -m -c "Kim De Waele" -s /bin/bash -g IT_medewerker -p $(openssl passwd -1 kim123) kimdw
+create_user "tinevdv" "Tine Van de Velde" "klantenrelaties"
+create_user "jorisq" "Joris Quataert" "administratie"
+create_user "kimdw" "Kim De Waele" "IT_medewerker"
 
 # Configure network interfaces
 interfaces_file="/etc/network/interfaces"
@@ -88,7 +68,7 @@ iface ens36 inet static
 EOF
 )
 
-# Backup the original file (optional but recommended)
+# Backup the original file
 cp "$interfaces_file" "$interfaces_file.bak"
 
 # Write the new content to the file
@@ -97,22 +77,19 @@ echo "$interfaces_content" > "$interfaces_file"
 # Configure ISC DHCP Server
 dhcp_server_file="/etc/default/isc-dhcp-server"
 dhcp_server_content=$(cat <<EOF
-
 INTERFACESv4="ens36"
 EOF
 )
 
-# Backup the original file (optional but recommended)
+# Backup the original file
 cp "$dhcp_server_file" "$dhcp_server_file.bak"
 
 # Write the new content to the file
 echo "$dhcp_server_content" > "$dhcp_server_file"
 
-
 # Configure DHCPD Server
 dhcpd_server_file="/etc/dhcp/dhcpd.conf"
 dhcpd_server_content=$(cat <<EOF
-
 option domain-name "tisib.local";
 option-domain-name-server 172.19.0.1;
 
@@ -130,55 +107,62 @@ subnet 172.19.0.0 netmask 255.255.0.0 {
 EOF
 )
 
-# Backup the original file (optional but recommended)
+# Backup the original file
 cp "$dhcpd_server_file" "$dhcpd_server_file.bak"
 
 # Write the new content to the file
 echo "$dhcpd_server_content" > "$dhcpd_server_file"
 
-
+# Enable ClamAV just-in-time scanning
 setsebool -P clamd_use_jit 1
 
-sed  - i  -e "s/^Example/#Example/" /etc/clamav/freshclam.conf 
+# Comment out the Example line in freshclam.conf
+sed -i -e "s/^Example/#Example/" /etc/clamav/freshclam.conf
 
-systemctl enable clamav
-systemctl enabld auditd
+# Enable ClamAV and auditd services
+systemctl enable clamav auditd
 
-mkdir /usr/local/webmin
+# Download and install Webmin
+mkdir -p /usr/local/webmin
 cd /usr/local/webmin
-wget https://prndownloads.sourceforge.net/webadmin/webmin-2-0.21.tar.gz 
-tar –xvzf webmin-2.021 
+wget https://prdownloads.sourceforge.net/webadmin/webmin-2.021.tar.gz
+tar -xvzf webmin-2.021
 cd webmin-2.021
-mkdir –p /usr/local/webmin/webmin 
+mkdir -p /usr/local/webmin/webmin
 
-
-#!/bin/bash
-
-# Display a message to the user
-echo "Voor webmin moet je bepaalde instellingen ingeven
-je mag gewoon enter duwen bij de default directory, logfile, path to perl, serverpoort. 
-En voor de login default kies je voor admin , met het wachtwoord school99 en start on boottime yes
-Duw nu op enter om door te gaan"
+# Display instructions for Webmin configuration
+echo "For Webmin, you need to provide certain settings.
+Press Enter to use the default directory, logfile, path to Perl, and server port.
+For the login defaults, choose 'admin' as the login name with the password 'school99' and set 'start on boot time' to 'yes'.
+Press Enter to continue."
 
 read
 
 echo "Continuing...."
 
-./setup.sh /usr/local/webmin/webmin 
+./setup.sh /usr/local/webmin/webmin
 
+# Enable and start Webmin service
 systemctl enable webmin
 systemctl start webmin
 
-echo "Ga nu naar het ip adress van ens33 gevolgd door :10000, Bv 192.168.2.24:10000 , om daar je webmin portaal te zien"
+echo "To access your Webmin portal, go to the IP address of ens33 followed by :10000, e.g., 192.168.2.24:10000."
 
-echo "Netwerk beveiliging"
-systemctl enable fail2ban  
-systemctl start fail2ban 
-ufw --force enable 
-ufw limit 22/tcp 
-ufw default allow incoming 
-ufw default allow outgoing 
-ufw allow in on lo 
-ufw allow out on lo 
-ufw logging on 
-systemctl enable --now ufw 
+# Network Security Configuration
+echo "Network security configuration..."
+
+# Enable and start fail2ban
+systemctl enable fail2ban
+systemctl start fail2ban
+
+# Configure UFW (Uncomplicated Firewall)
+ufw --force enable
+ufw limit 22/tcp
+ufw default allow incoming
+ufw default allow outgoing
+ufw allow in on lo
+ufw allow out on lo
+ufw logging on
+systemctl enable --now ufw
+
+echo "Script execution completed."
