@@ -1,4 +1,4 @@
-
+#Don't use fish anymore, since I've learned it isn't POSIX, use something like ZSH
 # My fish config. Not much to see here; just some pretty standard stuff.
 
 ### ADDING TO THE PATH
