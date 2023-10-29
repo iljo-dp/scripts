@@ -1,0 +1,53 @@
+#!/bin/bash
+
+sudo -A true
+
+check_for_luks2() {
+  luks2_partitions=()
+  for partition in $(lsblk -rpo "name" | grep -E '/dev/[a-z]+[0-9]+'); do
+    fs_info=$(sudo file -s "$partition")
+    if [[ $fs_info == *"luks2"* ]]; then
+      luks2_partitions+=("$partition")
+    fi
+  done
+  if [ ${#luks2_partitions[@]} -gt 0 ]; then
+    echo "${luks2_partitions[@]}"
+  else
+    echo "No LUKS2 partitions found."
+  fi
+}
+
+open_luks_partition() {
+  partition="$1"
+  num="$2"
+  uuid=$(sudo cryptsetup luksUUID "$partition")
+  device_name=$(basename "$partition")
+  new_name="luks-$device_name-$uuid"
+  sudo ${TERMINAL:-st} -n floatterm -g 60x1 -e cryptsetup open --type luks "$partition" "$new_name"
+}
+
+getmount(){
+	mp="$(find /mnt /home/iljo/usb /media /mount /home -maxdepth 1 -type d 2>/dev/null | dmenu -p "Mount this drive where?")"
+	test -n "$mp"
+	if [ ! -d "$mp" ]; then
+		mkdiryn=$(printf "No\\nYes" | dmenu -p "$mp does not exist. Create it?")
+		[ "$mkdiryn" = "Yes" ] && (mkdir -p "$mp" || sudo mkdir -p "$mp")
+	fi
+}
+luks2_partitions_found=$(check_for_luks2)
+
+if [ "$luks2_partitions_found" != "No LUKS2 partitions found." ]; then
+  for partition in $luks2_partitions_found; do
+    open_luks_partition "$partition" "$num"
+    getmount  # Prompt the user to choose a mount point
+    chosen_mount_point="$mp"
+    if [ -z "$chosen_mount_point" ]; then
+      notify-send "Mounting canceled." "The drive has not been mounted."
+    else
+      chosen_mount_point="${chosen_mount_point/#\~/$HOME}"  # Expand ~ to the user's home directory
+      mkdir -p "$chosen_mount_point"
+      sudo mount "/dev/mapper/luks-$(basename $partition)-$(sudo cryptsetup luksUUID $partition)" "$chosen_mount_point"
+      notify-send "💾 Drive Mounted." "Drive $partition has been mounted to $chosen_mount_point."
+    fi
+  done
+fi
