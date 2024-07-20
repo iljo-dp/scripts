@@ -134,7 +134,6 @@
   };
 
   # Enable ClamAV just-in-time scanning
-  security.pam.enable = true;
   services.clamav = {
     enable = true;
     freshclam = {
