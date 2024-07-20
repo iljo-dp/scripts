@@ -15,8 +15,8 @@
 
   # Enable networking
   networking.networkmanager.enable = false; # Disable NetworkManager for static configuration
-  networking.interfaces.ens33.useDHCP = true;
-  networking.interfaces.ens36 = {
+  networking.interfaces.enp1s0.useDHCP = true;
+  networking.interfaces.enp7s0 = {
     ipv4 = {
       addresses = [ {
         address = "172.19.0.1";
@@ -39,7 +39,7 @@
   users.mutableUsers = false; # Ensure no other users except those defined here
   users.users = {
     root = {
-      initialPassword = "root-password"; # Replace with a secure password
+      initialPassword = "root"; # Replace with a secure password
       shell = pkgs.fish;
       extraGroups = [ "wheel" ];
     };
@@ -47,7 +47,7 @@
     iljodp = {
       isNormalUser = true;
       description = "Iljo De Poorter";
-      initialPassword = "iljo123"; # Replace with a secure password
+      initialPassword = "iljo"; # Replace with a secure password
       extraGroups = [ "zaakvoerder" ];
     };
 
