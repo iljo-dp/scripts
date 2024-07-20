@@ -37,45 +37,47 @@
 
   # Define user accounts
   users.mutableUsers = false; # Ensure no other users except those defined here
-  users.users.root = {
-    initialPassword = "root-password"; # Replace with a secure password
-    shell = pkgs.fish;
-    extraGroups = [ "wheel" ];
-  };
+  users.users = {
+    root = {
+      initialPassword = "root-password"; # Replace with a secure password
+      shell = pkgs.fish;
+      extraGroups = [ "wheel" ];
+    };
 
-  users.users.iljodp = {
-    isNormalUser = true;
-    description = "Iljo De Poorter";
-    initialPassword = "iljo123"; # Replace with a secure password
-    extraGroups = [ "zaakvoerder" ];
-  };
+    iljodp = {
+      isNormalUser = true;
+      description = "Iljo De Poorter";
+      initialPassword = "iljo123"; # Replace with a secure password
+      extraGroups = [ "zaakvoerder" ];
+    };
 
-  users.users.davidb = {
-    isNormalUser = true;
-    description = "David Beerens";
-    initialPassword = "david123"; # Replace with a secure password
-    extraGroups = [ "zaakvoerder" ];
-  };
+    davidb = {
+      isNormalUser = true;
+      description = "David Beerens";
+      initialPassword = "david123"; # Replace with a secure password
+      extraGroups = [ "zaakvoerder" ];
+    };
 
-  users.users.tinevdv = {
-    isNormalUser = true;
-    description = "Tine Van de Velde";
-    initialPassword = "tine123"; # Replace with a secure password
-    extraGroups = [ "klantenrelaties" ];
-  };
+    tinevdv = {
+      isNormalUser = true;
+      description = "Tine Van de Velde";
+      initialPassword = "tine123"; # Replace with a secure password
+      extraGroups = [ "klantenrelaties" ];
+    };
 
-  users.users.jorisq = {
-    isNormalUser = true;
-    description = "Joris Quataert";
-    initialPassword = "joris123"; # Replace with a secure password
-    extraGroups = [ "administratie" ];
-  };
+    jorisq = {
+      isNormalUser = true;
+      description = "Joris Quataert";
+      initialPassword = "joris123"; # Replace with a secure password
+      extraGroups = [ "administratie" ];
+    };
 
-  users.users.kimdw = {
-    isNormalUser = true;
-    description = "Kim De Waele";
-    initialPassword = "kim123"; # Replace with a secure password
-    extraGroups = [ "IT_medewerker" ];
+    kimdw = {
+      isNormalUser = true;
+      description = "Kim De Waele";
+      initialPassword = "kim123"; # Replace with a secure password
+      extraGroups = [ "IT_medewerker" ];
+    };
   };
 
   # Define user groups
@@ -106,9 +108,6 @@
   # Copy Fish shell configuration
   environment.etc."fish/config.fish".text = builtins.readFile ./config.fish;
 
-  # Change the default shell for root user to Fish
-  users.users.root.shell = pkgs.fish;
-
   # Install Starship prompt
   programs.starship.enable = true;
 
@@ -138,12 +137,10 @@
   security.pam.enable = true;
   services.clamav = {
     enable = true;
-    settings = {
-      freshclam = {
-        settings = { 
-          # Update freshclam.conf to comment out "Example" line
-          postFile = "sed -i -e 's/^Example/#Example/' /etc/clamav/freshclam.conf";
-        };
+    freshclam = {
+      enable = true;
+      settings = {
+        postFile = "sed -i -e 's/^Example/#Example/' /etc/clamav/freshclam.conf";
       };
     };
   };
@@ -228,4 +225,3 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
 }
-
